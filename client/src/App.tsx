@@ -77,8 +77,9 @@ export function App() {
         console.warn('Backend REST unreachable, using live mock state', err);
       });
 
-    // 2. Connect Socket.io
-    const newSocket = io('http://localhost:4000', {
+    // 2. Connect Socket.io (dynamically connects to origin in cloud deployment or localhost:4000 in dev)
+    const socketUrl = window.location.port === '3000' ? 'http://localhost:4000' : window.location.origin;
+    const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
     });
 

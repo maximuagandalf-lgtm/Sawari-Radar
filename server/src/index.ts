@@ -1,5 +1,6 @@
 import express from 'express';
 import http from 'http';
+import path from 'path';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import { CITIES } from './data/hubs';
@@ -157,7 +158,15 @@ setInterval(() => {
   io.emit('hubs_updated', demandEngine.getAllHubs());
 }, 10000);
 
+// Serve client build in production
+const clientDistPath = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientDistPath));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDistPath, 'index.html'));
+});
+
 server.listen(PORT, async () => {
-  console.log(`🚀 Demand Radar Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Sawari Radar Server running on port ${PORT}`);
   await checkDatabaseConnection();
 });

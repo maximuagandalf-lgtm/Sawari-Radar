@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
+const path_1 = __importDefault(require("path"));
 const socket_io_1 = require("socket.io");
 const cors_1 = __importDefault(require("cors"));
 const hubs_1 = require("./data/hubs");
@@ -135,7 +136,13 @@ io.on('connection', (socket) => {
 setInterval(() => {
     io.emit('hubs_updated', demandEngine_1.demandEngine.getAllHubs());
 }, 10000);
+// Serve client build in production
+const clientDistPath = path_1.default.join(__dirname, '../../client/dist');
+app.use(express_1.default.static(clientDistPath));
+app.get('*', (req, res) => {
+    res.sendFile(path_1.default.join(clientDistPath, 'index.html'));
+});
 server.listen(PORT, async () => {
-    console.log(`🚀 Demand Radar Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Sawari Radar Server running on port ${PORT}`);
     await (0, db_1.checkDatabaseConnection)();
 });
